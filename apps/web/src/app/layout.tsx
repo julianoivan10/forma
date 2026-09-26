@@ -4,9 +4,8 @@ import type { ReactNode } from "react";
 
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { MainnetAlert } from "@/components/NetworkGuard";
+import { NetworkAlert } from "@/components/NetworkGuard";
 import { Providers } from "@/components/Providers";
-import { TestnetBanner } from "@/components/TestnetBanner";
 import { TxDock } from "@/components/TxStatus";
 
 import "./globals.css";
@@ -44,9 +43,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to content
         </a>
         <Providers>
-          <TestnetBanner />
-          <MainnetAlert />
           <Header />
+          <NetworkAlert />
           <main id="main" className="mx-auto max-w-[1440px] px-4 sm:px-8">
             {children}
           </main>

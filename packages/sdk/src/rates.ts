@@ -41,3 +41,33 @@ export function emissionPerSecond(rewardRate: bigint): bigint {
 export function streamEndsWithinYear(periodFinish: bigint, nowSeconds: bigint): boolean {
   return periodFinish < nowSeconds + 365n * SECONDS_PER_DAY;
 }
+
+// ─── presentation guard (does not change any reward math) ─────────────────
+
+/** A new stake above this share of total weight makes an annualised figure mostly an artefact of thin liquidity. */
+export const APR_MAX_NEW_STAKE_SHARE_BPS = 1_000n; // 10 %
+/** Above this, an on-chain APR is shown as "not meaningful" regardless of liquidity. */
+export const APR_MAX_DISPLAY_BPS = 100_000n; // 1,000 %
+
+export const APR_NOT_MEANINGFUL_LABEL = "Not meaningful yet";
+export const APR_NOT_MEANINGFUL_NOTE = "Testnet emission estimate is highly sensitive to current pool liquidity.";
+
+export type AprAssessment =
+  | { kind: "no-stream" }
+  | { kind: "not-meaningful"; reason: "thin-liquidity" | "extreme" }
+  | { kind: "estimate"; aprBps: bigint; apyBps: bigint | null };
+
+/**
+ * Decides whether an on-chain APR estimate (`previewStake().estimatedAprBps`) is worth displaying.
+ * `newWeight` is the previewed stake's weight; `totalWeight` is the protocol's current total weight
+ * (before the new stake). Pure presentation logic: the rate itself is never altered.
+ */
+export function assessAprEstimate(aprBps: bigint, newWeight: bigint, totalWeight: bigint): AprAssessment {
+  if (aprBps <= 0n) return { kind: "no-stream" };
+  const combined = totalWeight + newWeight;
+  if (combined === 0n || newWeight * 10_000n > APR_MAX_NEW_STAKE_SHARE_BPS * combined) {
+    return { kind: "not-meaningful", reason: "thin-liquidity" };
+  }
+  if (aprBps > APR_MAX_DISPLAY_BPS) return { kind: "not-meaningful", reason: "extreme" };
+  return { kind: "estimate", aprBps, apyBps: aprBpsToApyBps(aprBps) };
+}

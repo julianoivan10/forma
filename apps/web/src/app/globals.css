@@ -123,6 +123,8 @@
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 0.92;
+    /* Safety net for single long words on very narrow screens. */
+    overflow-wrap: break-word;
   }
 
   .mono {

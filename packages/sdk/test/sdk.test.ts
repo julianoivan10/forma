@@ -2,7 +2,9 @@ import { BaseError, ContractFunctionRevertedError, encodeErrorResult, UserReject
 import { describe, expect, it } from "vitest";
 
 import {
+  APR_NOT_MEANINGFUL_LABEL,
   aprBpsToApyBps,
+  assessAprEstimate,
   deriveMilestones,
   describeError,
   formaStakingAbi,
@@ -103,6 +105,28 @@ describe("rates", () => {
     // 10% APR → ~10.515% APY
     expect(aprBpsToApyBps(1000n)).toBe(1051n);
     expect(aprBpsToApyBps(0n)).toBeNull();
+  });
+});
+
+describe("APR presentation guard", () => {
+  it("hides estimates when a new stake would dominate total weight", () => {
+    // Empty protocol: the reference stake would receive the entire emission.
+    expect(assessAprEstimate(20_277_777n, 1000n * E18, 0n)).toEqual({ kind: "not-meaningful", reason: "thin-liquidity" });
+    // 1,000 into 5,000 existing weight is a 16.7 % share: still too thin.
+    expect(assessAprEstimate(5_000n, 1000n * E18, 5000n * E18)).toMatchObject({ kind: "not-meaningful" });
+  });
+
+  it("hides extreme values even with enough liquidity", () => {
+    expect(assessAprEstimate(150_000n, 1000n * E18, 1_000_000n * E18)).toEqual({ kind: "not-meaningful", reason: "extreme" });
+  });
+
+  it("shows a bounded estimate once liquidity is deep enough, without altering it", () => {
+    expect(assessAprEstimate(1_000n, 1000n * E18, 9000n * E18)).toEqual({ kind: "estimate", aprBps: 1_000n, apyBps: 1051n });
+  });
+
+  it("reports no stream", () => {
+    expect(assessAprEstimate(0n, 1000n * E18, 0n)).toEqual({ kind: "no-stream" });
+    expect(APR_NOT_MEANINGFUL_LABEL).toBe("Not meaningful yet");
   });
 });
 

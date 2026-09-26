@@ -22,7 +22,7 @@ export default function PositionsPage() {
   return (
     <div className="pt-10">
       <p className="label">Positions</p>
-      <h1 className="display mt-3 text-[clamp(2.5rem,6vw,5rem)]">Your positions</h1>
+      <h1 className="display mt-3 text-[clamp(2rem,6vw,5rem)]">Your positions</h1>
       <p className="mt-4 max-w-prose text-ink-2">
         Each position is an ERC-721 held by your wallet. The list below is read from the NFT&apos;s on-chain owner
         index — no indexer involved.

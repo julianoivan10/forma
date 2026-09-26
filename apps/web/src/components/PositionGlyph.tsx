@@ -1,4 +1,4 @@
-import { formatMultiplier, GLYPH_HEX, glyphModel } from "@forma/sdk";
+import { formatMultiplier, GLYPH_HEX, glyphModel, type GlyphModel } from "@forma/sdk";
 
 export interface GlyphInput {
   id: bigint;
@@ -6,6 +6,42 @@ export interface GlyphInput {
   startTime: bigint;
   unlockTime: bigint;
   activeMultiplierBps: number;
+}
+
+/**
+ * The glyph's marks, centred on (0, 0) in a 240-unit box. Shared by the standalone glyph and the NFT card preview
+ * so both follow the on-chain renderer's geometry (PositionRenderer._glyph).
+ */
+export function GlyphMarks({ model: g, animate = false }: { model: GlyphModel; animate?: boolean }) {
+  const ticks = Array.from({ length: g.tickCount }, (_, i) => i);
+  return (
+    <g transform={`rotate(${g.rotation})`}>
+      <g stroke="#0e1a2b" strokeWidth={1.5}>
+        {ticks.map((i) => (
+          <line
+            key={i}
+            x1={0}
+            y1={-112}
+            x2={0}
+            y2={i % 4 === 0 ? -100 : -106}
+            transform={`rotate(${(i * 360) / g.tickCount})`}
+          />
+        ))}
+      </g>
+      <circle r={86} fill="none" stroke="#0e1a2b" strokeOpacity={0.12} strokeWidth={g.strokeWidth} />
+      <circle
+        r={86}
+        fill="none"
+        stroke={GLYPH_HEX[g.hue]}
+        strokeWidth={g.strokeWidth}
+        pathLength={1000}
+        strokeDasharray={`${g.progress} 1000`}
+        transform="rotate(-90)"
+        className={animate ? "animate-arc" : undefined}
+      />
+      <circle r={58} fill="#0e1a2b" />
+    </g>
+  );
 }
 
 /**
@@ -29,8 +65,6 @@ export function PositionGlyph({
   title?: string;
 }) {
   const g = glyphModel({ ...input, nowSeconds: now });
-  const color = GLYPH_HEX[g.hue];
-  const ticks = Array.from({ length: g.tickCount }, (_, i) => i);
   return (
     <svg
       viewBox="-120 -120 240 240"
@@ -44,32 +78,7 @@ export function PositionGlyph({
       className="shrink-0"
       style={{ maxWidth: "100%", height: "auto" }}
     >
-      <g transform={`rotate(${g.rotation})`}>
-        <g stroke="#0e1a2b" strokeWidth={1.5}>
-          {ticks.map((i) => (
-            <line
-              key={i}
-              x1={0}
-              y1={-112}
-              x2={0}
-              y2={i % 4 === 0 ? -100 : -106}
-              transform={`rotate(${(i * 360) / g.tickCount})`}
-            />
-          ))}
-        </g>
-        <circle r={86} fill="none" stroke="#0e1a2b" strokeOpacity={0.12} strokeWidth={g.strokeWidth} />
-        <circle
-          r={86}
-          fill="none"
-          stroke={color}
-          strokeWidth={g.strokeWidth}
-          pathLength={1000}
-          strokeDasharray={`${g.progress} 1000`}
-          transform="rotate(-90)"
-          className={animate ? "animate-arc" : undefined}
-        />
-        <circle r={58} fill="#0e1a2b" />
-      </g>
+      <GlyphMarks model={g} animate={animate} />
       {showMultiplier && (
         <text
           x={0}

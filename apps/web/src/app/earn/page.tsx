@@ -40,7 +40,7 @@ export default function EarnPage() {
   return (
     <div className="pt-10">
       <p className="label">Earn</p>
-      <h1 className="display mt-3 text-[clamp(2.5rem,6vw,5rem)]">Rewards &amp; compounding</h1>
+      <h1 className="display mt-3 text-[clamp(2rem,6vw,5rem)]">Rewards &amp; compounding</h1>
 
       {/* ─── protocol stream ─── */}
       <section className="mt-10">

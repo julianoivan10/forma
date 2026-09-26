@@ -5,6 +5,7 @@ import { formatCountdown, formatDateTimeUTC, formatToken } from "@forma/sdk";
 import { useAccount, useDisconnect, useSwitchChain } from "wagmi";
 
 import { ActionGate } from "@/components/NetworkGuard";
+import { TestnetDisclosure } from "@/components/TestnetDisclosure";
 import { TxStatus } from "@/components/TxStatus";
 import { AddressLink, Empty, Loading, Row, SectionHeader, TxLink } from "@/components/ui";
 import { ANVIL_ENABLED, env } from "@/lib/env";
@@ -24,7 +25,10 @@ export default function SettingsPage() {
   return (
     <div className="pt-10">
       <p className="label">Settings</p>
-      <h1 className="display mt-3 text-[clamp(2.5rem,6vw,5rem)]">Wallet &amp; network</h1>
+      <h1 className="display mt-3 text-[clamp(2rem,6vw,5rem)]">Wallet &amp; network</h1>
+      <div className="mt-8 max-w-3xl">
+        <TestnetDisclosure id="disclosure" />
+      </div>
 
       <div className="mt-10 grid gap-12 lg:grid-cols-2">
         <section>

@@ -68,7 +68,7 @@ export default function LiquidPage() {
   return (
     <div className="pt-10">
       <p className="label">Liquid staking · ERC-4626</p>
-      <h1 className="display mt-3 text-[clamp(2.5rem,6vw,5rem)]">stFORGE</h1>
+      <h1 className="display mt-3 text-[clamp(2rem,6vw,5rem)]">stFORGE</h1>
       <p className="mt-4 max-w-2xl text-ink-2">
         The vault keeps all deposited FORGE staked in a single no-lock Forma position and compounds its rewards. You
         hold shares. The exchange rate is <em>underlying assets per share</em>: it rises only when rewards actually

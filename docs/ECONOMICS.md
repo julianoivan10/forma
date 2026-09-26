@@ -61,8 +61,13 @@ date (shown), other stakers enter and leave, and boosts expire.
 **Why testnet APRs look absurd.** With 55K FORGE/day and little FORGE staked,
 a new stake receives a huge share of emission — e.g. with nothing staked, a
 1,000 FORGE stake would receive the whole stream, an APR in the millions of
-percent. The app states this explicitly when the pool is empty. It is correct
-arithmetic on test parameters, and meaningless as a return.
+percent. That is correct arithmetic on test parameters, and meaningless as a
+return, so the app does not show it: whenever the previewed stake would be more
+than 10 % of total weight, or the on-chain APR exceeds 1,000 %, the rate reads
+**"Not meaningful yet"** with the note *"Testnet emission estimate is highly
+sensitive to current pool liquidity."* (`assessAprEstimate` in `@forma/sdk`; the
+on-chain figure itself is never altered). Displayed estimates are always
+labelled **EST. APR · TESTNET**.
 
 ## Penalties, forfeits and where they go
 

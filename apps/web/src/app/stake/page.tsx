@@ -1,15 +1,17 @@
 "use client";
 
 import {
+  assessAprEstimate,
   formaStakingAbi,
   formatBpsPercent,
   formatDateTimeUTC,
   formatLockDuration,
   formatMultiplier,
-  formatRateBps,
   formatToken,
+  formatTokenCompact,
   parseTokenInput,
   perDay,
+  type AprAssessment,
 } from "@forma/sdk";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -18,12 +20,13 @@ import { parseEventLogs } from "viem";
 
 import { AmountInput } from "@/components/AmountInput";
 import { ActionGate } from "@/components/NetworkGuard";
-import { PoolTable } from "@/components/PoolTable";
-import { PositionGlyph } from "@/components/PositionGlyph";
+import { AprEstimate } from "@/components/AprEstimate";
+import { PoolTable, REFERENCE_STAKE } from "@/components/PoolTable";
+import { PositionPreviewCard } from "@/components/PositionPreviewCard";
 import { TxStatus } from "@/components/TxStatus";
-import { Row, TestnetEstimate } from "@/components/ui";
+import { Row } from "@/components/ui";
 import { useForma } from "@/lib/forma";
-import { useForgeAccount, useProtocol, useStakePreview } from "@/lib/reads";
+import { useForgeAccount, usePoolPreviews, useProtocol, useStakePreview } from "@/lib/reads";
 import { useNow } from "@/lib/time";
 import { useFormaTx } from "@/lib/write";
 
@@ -37,9 +40,12 @@ export default function StakePage() {
 
 function Step({ n, title, done, children }: { n: number; title: string; done?: boolean; children: React.ReactNode }) {
   return (
-    <section className="grid gap-4 border-t border-ink pt-5 pb-10 md:grid-cols-[180px_1fr]">
+    <section className="grid gap-4 border-t border-ink pt-4 pb-9 md:grid-cols-[128px_minmax(0,1fr)]">
       <div className="flex items-start gap-3 md:block">
-        <span className={`numeral text-4xl ${done ? "text-lime-ink" : ""}`}>{String(n).padStart(2, "0")}</span>
+        <span className={`numeral text-3xl ${done ? "text-lime-ink" : ""}`}>
+          {String(n).padStart(2, "0")}
+          {done && <span className="sr-only"> (complete)</span>}
+        </span>
         <h2 className="label mt-2 text-ink">{title}</h2>
       </div>
       <div className="min-w-0">{children}</div>
@@ -49,15 +55,19 @@ function Step({ n, title, done, children }: { n: number; title: string; done?: b
 
 function StakeFlow() {
   const params = useSearchParams();
-  const initial = Number(params.get("pool"));
-  const [poolId, setPoolId] = useState<number | undefined>(Number.isInteger(initial) && initial >= 0 ? initial : undefined);
+  // Only an explicit ?pool=N preselects a tier; otherwise the flow starts at "awaiting terms".
+  const rawPool = params.get("pool");
+  const [poolId, setPoolId] = useState<number | undefined>(
+    rawPool !== null && /^\d+$/.test(rawPool) ? Number(rawPool) : undefined,
+  );
   const [input, setInput] = useState("");
   const [acknowledged, setAcknowledged] = useState(false);
   const [createdId, setCreatedId] = useState<bigint | null>(null);
 
   const now = useNow();
   const { address } = useForma();
-  const { pools, positionsCreated, paused } = useProtocol();
+  const { pools, positionsCreated, paused, rewardState } = useProtocol();
+  const referencePreviews = usePoolPreviews(pools?.length ?? 0, REFERENCE_STAKE);
   const forge = useForgeAccount();
   const { send, targets, isActive } = useFormaTx();
 
@@ -117,11 +127,43 @@ function StakeFlow() {
 
   const expectedId = positionsCreated !== undefined ? positionsCreated + 1n : undefined;
 
+  // Presentation guard only: the on-chain estimate is shown when it is economically meaningful.
+  const userAssessment: AprAssessment | undefined =
+    preview.data && rewardState
+      ? assessAprEstimate(preview.data.estimatedAprBps, preview.data.weight, rewardState.totalWeight)
+      : undefined;
+  const refPreview = poolId !== undefined ? referencePreviews.data?.[poolId] : undefined;
+  const referenceAssessment: AprAssessment | undefined =
+    refPreview?.status === "success" && rewardState
+      ? assessAprEstimate(refPreview.result.estimatedAprBps, refPreview.result.weight, rewardState.totalWeight)
+      : undefined;
+
+  const rewardStateNode =
+    valid && userAssessment && preview.data ? (
+      userAssessment.kind === "estimate" ? (
+        <span>
+          ≈ {formatToken(perDay(preview.data.rewardPerSecond), { maxDecimals: 2 })} FORGE/day
+          <span className="block text-ink-3">
+            <AprEstimate assessment={userAssessment} />
+          </span>
+        </span>
+      ) : (
+        <AprEstimate assessment={userAssessment} withNote />
+      )
+    ) : referenceAssessment ? (
+      <span>
+        <span className="block text-ink-3">For {formatTokenCompact(REFERENCE_STAKE)} FORGE:</span>
+        <AprEstimate assessment={referenceAssessment} withNote />
+      </span>
+    ) : (
+      "Enter an amount"
+    );
+
   return (
-    <div className="grid gap-10 pt-10 lg:grid-cols-[1fr_360px]">
+    <div className="grid gap-10 pt-8 xl:grid-cols-[minmax(0,1fr)_340px]">
       <div>
         <p className="label">Stake</p>
-        <h1 className="display mt-3 mb-10 text-[clamp(2.5rem,6vw,5rem)]">Open a position</h1>
+        <h1 className="display mt-2 mb-6 text-[clamp(2rem,4.2vw,3.5rem)]">Open a position</h1>
 
         {paused && (
           <p role="alert" className="mb-8 border-l-2 border-orange bg-orange/10 px-4 py-3 text-sm">
@@ -130,9 +172,9 @@ function StakeFlow() {
         )}
 
         <Step n={1} title="Choose lock tier" done={pool !== undefined}>
-          <p className="mb-4 max-w-prose text-sm text-ink-2">
-            Pools are lock tiers. All positions share one reward stream, weighted by principal × multiplier. The
-            multiplier applies while the position is locked and drops to 1.00× at unlock.
+          <p className="mb-3 max-w-prose text-sm text-ink-2">
+            Pools are lock tiers sharing one reward stream, weighted by principal × multiplier. The multiplier applies
+            while locked and drops to 1.00× at unlock.
           </p>
           <PoolTable select={chooseTier} selected={poolId} />
         </Step>
@@ -201,22 +243,16 @@ function StakeFlow() {
               <Row k="Multiplier" v={formatMultiplier(preview.data.multiplierBps)} />
               <Row k="Weight" v={formatToken(preview.data.weight)} />
               <Row
-                k="Est. reward rate"
+                k="Est. reward rate · testnet"
                 v={
-                  preview.data.rewardPerSecond > 0n
+                  userAssessment?.kind === "estimate"
                     ? `${formatToken(perDay(preview.data.rewardPerSecond), { maxDecimals: 4 })} FORGE / day`
-                    : "No active stream"
+                    : userAssessment
+                      ? <AprEstimate assessment={userAssessment} />
+                      : "—"
                 }
               />
-              <Row
-                k="Est. APR"
-                v={
-                  <span className="inline-flex items-center gap-2">
-                    {formatRateBps(preview.data.estimatedAprBps > 0n ? preview.data.estimatedAprBps : null)}
-                    <TestnetEstimate />
-                  </span>
-                }
-              />
+              <Row k="Est. APR · testnet" v={userAssessment ? <AprEstimate assessment={userAssessment} withNote /> : "—"} />
               <Row k="Unlock date" v={preview.data.lockDuration === 0n ? "Immediately" : formatDateTimeUTC(preview.data.unlockTime)} />
               <Row k="Position NFT" v={expectedId ? `FORMA-POS · expected #${expectedId}` : "FORMA-POS"} />
             </dl>
@@ -276,33 +312,14 @@ function StakeFlow() {
         </Step>
       </div>
 
-      <aside className="lg:sticky lg:top-6 lg:self-start">
-        <div className="border border-ink bg-paper p-5">
-          <p className="label">Position NFT · preview</p>
-          <div className="my-4 flex justify-center">
-            {pool && amount !== undefined && !amountError ? (
-              <PositionGlyph
-                input={{
-                  id: expectedId ?? 0n,
-                  principal: amount,
-                  startTime: now,
-                  unlockTime: now + pool.lockDuration,
-                  activeMultiplierBps: pool.multiplierBps,
-                }}
-                now={now}
-                size={240}
-                title="Preview of the position glyph (not yet minted)"
-              />
-            ) : (
-              <div className="flex size-[240px] items-center justify-center border border-dashed border-rule-strong">
-                <span className="label">Awaiting terms</span>
-              </div>
-            )}
-          </div>
-          <p className="mono text-[11px] tracking-[0.12em] text-ink-2 uppercase">
-            Not yet minted · rendered from your inputs with the same formula as the on-chain renderer
-          </p>
-        </div>
+      <aside className="xl:sticky xl:top-6 xl:self-start">
+        <PositionPreviewCard
+          pool={pool}
+          expectedId={expectedId}
+          amount={amount !== undefined && !amountError ? amount : undefined}
+          now={now}
+          rewardState={rewardStateNode}
+        />
       </aside>
     </div>
   );

@@ -22,6 +22,7 @@ export function Footer() {
         <div>
           <p className="label mb-3">Testnet</p>
           <ul className="space-y-2 text-sm">
+            <li><Link className="hover:underline" href="/settings#disclosure">Testnet disclosure</Link></li>
             <li><Link className="hover:underline" href="/settings#faucet">FORGE faucet</Link></li>
             <li><Link className="hover:underline" href="/activity">On-chain activity</Link></li>
             <li><Link className="hover:underline" href="/settings">Network &amp; wallet</Link></li>

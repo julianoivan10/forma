@@ -7,10 +7,10 @@ import { RPC_URL } from "./chain";
  * Injects an EIP-1193 wallet that forwards to Anvil. Transactions are really sent and mined.
  * `window.__formaRejectNext = true` makes the next signature request fail with code 4001 (user rejection).
  */
-export async function injectWallet(page: Page, account: Address) {
+export async function injectWallet(page: Page, account: Address, walletChainId = "0x7a69") {
   await page.addInitScript(
-    ({ rpcUrl, account }) => {
-      const chainId = "0x7a69";
+    ({ rpcUrl, account, walletChainId }) => {
+      const chainId = walletChainId;
       let id = 0;
       const listeners: Record<string, ((...a: unknown[]) => void)[]> = {};
       const w = window as unknown as Record<string, unknown>;
@@ -39,7 +39,7 @@ export async function injectWallet(page: Page, account: Address) {
             case "eth_chainId":
               return chainId;
             case "net_version":
-              return "31337";
+              return String(parseInt(chainId, 16));
             case "wallet_switchEthereumChain": {
               const target = (params?.[0] as { chainId?: string } | undefined)?.chainId?.toLowerCase();
               if (target === chainId) return null;
@@ -77,7 +77,7 @@ export async function injectWallet(page: Page, account: Address) {
       };
       w.ethereum = provider;
     },
-    { rpcUrl: RPC_URL, account },
+    { rpcUrl: RPC_URL, account, walletChainId },
   );
 }
 

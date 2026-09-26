@@ -120,8 +120,14 @@ explorer link (or "local" on Anvil), contract, amount and block.
 
 ### Wallet and network guards
 
-- `MainnetAlert` (global): a red bar whenever the wallet is on a known mainnet
-  chain id; no transaction is ever built for it.
+- `NetworkStatus` (navbar, every page): the network (`BASE SEPOLIA · TESTNET`)
+  and the wallet state in words; a slim strip below the `xl` breakpoint. The
+  full testnet disclosure (`TestnetDisclosure`) lives on Settings and Docs and
+  is linked from the footer.
+- `NetworkAlert` (global): an actionable bar when the wallet is on an
+  unsupported chain (orange) or a known mainnet (red, "blocked") with a
+  one-click switch and a manual-setup fallback; no transaction is ever built
+  for those chains.
 - `ActionGate` wraps every write control and renders the missing step instead:
   connect, switch network (with rejection handling and manual fallback
   instructions), or "not deployed on this network".

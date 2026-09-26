@@ -65,7 +65,7 @@ export default function ActivityPage() {
   return (
     <div className="pt-10">
       <p className="label">Activity</p>
-      <h1 className="display mt-3 text-[clamp(2.5rem,6vw,5rem)]">On-chain activity</h1>
+      <h1 className="display mt-3 text-[clamp(2rem,6vw,5rem)]">On-chain activity</h1>
 
       <div className="mt-8 grid gap-px bg-rule text-sm md:grid-cols-2">
         <div className="bg-ivory p-4">

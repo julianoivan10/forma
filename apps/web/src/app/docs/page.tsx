@@ -3,9 +3,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { TestnetDisclosure } from "@/components/TestnetDisclosure";
+
 export const metadata: Metadata = { title: "Protocol documentation" };
 
 const TOC = [
+  ["testnet", "Testnet disclosure"],
   ["overview", "Overview"],
   ["pools", "Pools & multipliers"],
   ["rewards", "Reward accounting"],
@@ -46,7 +49,7 @@ export default function DocsPage() {
           {TOC.map(([id, t], i) => (
             <li key={id}>
               <a className="hover:underline" href={`#${id}`}>
-                <span className="text-ink-3">{String(i + 1).padStart(2, "0")}</span> {t}
+                <span className="text-ink-3">{String(i).padStart(2, "0")}</span> {t}
               </a>
             </li>
           ))}
@@ -55,12 +58,15 @@ export default function DocsPage() {
 
       <article className="min-w-0">
         <p className="label">Documentation</p>
-        <h1 className="display mt-3 mb-4 text-[clamp(2.5rem,6vw,5rem)]">How Forma works</h1>
+        <h1 className="display mt-3 mb-4 text-[clamp(2rem,6vw,5rem)]">How Forma works</h1>
         <p className="mb-10 max-w-prose text-ink-2">
           A summary of the protocol specification. The complete, normative version lives in{" "}
           <code className="mono">docs/PROTOCOL.md</code> in the repository, alongside SECURITY, ECONOMICS and DEPLOYMENT.
           Not audited. Testnet only.
         </p>
+        <div className="mb-10 max-w-[68ch]">
+          <TestnetDisclosure id="testnet" />
+        </div>
 
         <Section id="overview" n={1} title="Overview">
           <p>

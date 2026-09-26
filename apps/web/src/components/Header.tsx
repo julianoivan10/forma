@@ -4,10 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { useForma } from "@/lib/forma";
-
 import { ConnectWallet } from "./ConnectWallet";
 import { FormaMark } from "./FormaMark";
+import { NetworkStatus } from "./NetworkStatus";
 
 const NAV = [
   { href: "/stake", label: "Stake" },
@@ -21,7 +20,6 @@ const NAV = [
 
 export function Header() {
   const pathname = usePathname();
-  const { networkLabel } = useForma();
   // The menu is open only on the path where it was opened, so navigating closes it without an effect.
   const [openedOn, setOpenedOn] = useState<string | null>(null);
   const open = openedOn === pathname;
@@ -53,10 +51,7 @@ export function Header() {
         </nav>
 
         <div className="ml-auto flex min-w-0 items-center gap-2 sm:gap-3">
-          <span className="tag hidden border-ink/40 text-ink-2 md:inline-flex" title="Active read network">
-            <span aria-hidden className="size-1.5 bg-orange" />
-            {networkLabel}
-          </span>
+          <NetworkStatus layout="inline" />
           <ConnectWallet compact />
           <button
             type="button"
@@ -69,6 +64,7 @@ export function Header() {
           </button>
         </div>
       </div>
+      <NetworkStatus layout="strip" />
 
       {open && (
         <nav id="mobile-nav" aria-label="Primary mobile" className="rule-t lg:hidden">
@@ -85,9 +81,6 @@ export function Header() {
               </li>
             ))}
           </ul>
-          <p className="mono rule-t px-4 py-2 text-[10px] tracking-[0.14em] text-ink-2 uppercase sm:px-8">
-            {networkLabel}
-          </p>
         </nav>
       )}
     </header>
