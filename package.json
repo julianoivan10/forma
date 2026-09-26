@@ -1,0 +1,31 @@
+{
+  "name": "forma",
+  "private": true,
+  "description": "Forma \u2014 programmable staking positions. Base Sepolia testnet only.",
+  "packageManager": "pnpm@10.33.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build:contracts": "pnpm --filter @forma/contracts build",
+    "test:contracts": "pnpm --filter @forma/contracts test",
+    "abis": "node scripts/export-abis.mjs",
+    "dev": "pnpm --filter @forma/web dev",
+    "build": "pnpm abis && pnpm --filter @forma/web build",
+    "test:web": "pnpm --filter @forma/web test",
+    "e2e": "pnpm --filter @forma/web e2e",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "anvil": "anvil --chain-id 31337 --block-time 2",
+    "deploy:local": "node scripts/deploy.mjs anvil",
+    "deploy:base-sepolia": "node scripts/deploy.mjs base-sepolia",
+    "test:sdk": "pnpm --filter @forma/sdk test",
+    "test": "pnpm test:contracts && pnpm test:sdk && pnpm test:web"
+  },
+  "pnpm": {
+    "overrides": {
+      "@coinbase/cdp-sdk": "1.52.0"
+    },
+    "//": "cdp-sdk >=1.53 statically imports optional @x402/* peers that Turbopack cannot resolve; Forma never uses x402. Pulled in transitively via RainbowKit -> @wagmi/connectors -> @base-org/account."
+  }
+}

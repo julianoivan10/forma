@@ -1,0 +1,40 @@
+# deps
+node_modules/
+.pnpm-store/
+
+# env & secrets — never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+keystore/
+
+# foundry
+packages/contracts/out/
+packages/contracts/cache/
+packages/contracts/broadcast/*/31337/
+packages/contracts/broadcast/**/dry-run/
+packages/contracts/lcov.info
+packages/contracts/coverage/
+
+
+# next / web
+apps/web/.next/
+apps/web/out/
+apps/web/next-env.d.ts
+apps/web/test-results/
+apps/web/playwright-report/
+*.tsbuildinfo
+dist/
+
+# os / editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# tooling
+slither-report.*
+crytic-export/

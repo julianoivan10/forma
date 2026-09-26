@@ -1,0 +1,22 @@
+{
+  "name": "@forma/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "forge build --sizes",
+    "test": "forge test",
+    "test:unit": "forge test --match-path \"test/unit/**\"",
+    "test:fuzz": "forge test --match-path \"test/fuzz/**\"",
+    "test:invariant": "forge test --match-path \"test/invariant/**\"",
+    "coverage": "forge coverage --report summary --ir-minimum",
+    "fmt": "forge fmt",
+    "fmt:check": "forge fmt --check",
+    "slither": "slither . --config-file slither.config.json"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "5.6.1"
+  },
+  "devDependencies": {
+    "forge-std": "github:foundry-rs/forge-std#v1.16.2"
+  }
+}
