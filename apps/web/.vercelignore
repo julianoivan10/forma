@@ -1,0 +1,29 @@
+# Files that must never be uploaded to Vercel (gitignore syntax).
+# The frontend needs only the workspace sources; it needs no secret of any kind.
+
+# Local environment files and secrets (examples are safe to upload)
+**/.env
+**/.env.*
+!**/.env.example
+**/*.pem
+**/*.key
+**/*.keystore
+**/keystore/
+**/keystores/
+.foundry/
+
+# Foundry: build output, cached sensitive values, broadcast logs (not needed by the frontend)
+packages/contracts/out/
+packages/contracts/cache/
+packages/contracts/broadcast/
+packages/contracts/lcov.info
+packages/contracts/coverage/
+
+# Local tooling and artifacts
+**/node_modules/
+**/.next/
+**/test-results/
+**/playwright-report/
+**/slither-report.*
+**/crytic-export/
+.claude/

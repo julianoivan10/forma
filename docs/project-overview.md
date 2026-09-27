@@ -5,8 +5,9 @@ is an on-chain object: an NFT-represented position with its own lock,
 multiplier, reward stream and routing policy, plus an ERC-4626 liquid staking
 vault. Built with Solidity/Foundry and Next.js on Base Sepolia.
 
-Status: contracts, tests and frontend complete and working on a local chain;
-Base Sepolia deployment and real-wallet testing pending. **Not audited.**
+Status: contracts deployed and source-verified on Base Sepolia; frontend complete and
+end-to-end tested on a local chain; real-wallet testnet run and public frontend pending.
+**Not audited.**
 
 ## Problem
 
@@ -94,9 +95,12 @@ that no pause can block; snapshotted terms plus reviewed-terms checks on
 
 ## Testnet deployment
 
-Pending. The deployment pipeline (allow-listed networks, keystore signing,
-Basescan verification, manifest with tx hashes, role hand-over) is built and
-tested locally. See [DEPLOYMENT.md](DEPLOYMENT.md) and [TESTNET.md](TESTNET.md).
+Contracts deployed to Base Sepolia (chain id 84532) on 2026-09-27 with the
+project's guarded pipeline (keystore signing, chain-id checks, Basescan
+verification, manifest with tx hashes). All five sources are verified and the
+wiring, pools, reward stream and roles were checked on-chain. The real-wallet
+acceptance run and the public frontend are pending. Addresses and details:
+[TESTNET.md](TESTNET.md).
 
 ## Known limitations
 

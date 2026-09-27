@@ -10,7 +10,7 @@ import {
   rainbowWallet,
   walletConnectWallet,
 } from "@rainbow-me/rainbowkit/wallets";
-import { createConfig, http } from "wagmi";
+import { createConfig, http, type Transport } from "wagmi";
 import { anvil, baseSepolia } from "wagmi/chains";
 
 import { ANVIL_ENABLED, env } from "./env";
@@ -34,14 +34,18 @@ const connectors = connectorsForWallets(
   },
 );
 
+const transports: Record<number, Transport> = {
+  // Unset → viem's public Base Sepolia endpoint (https://sepolia.base.org).
+  [baseSepolia.id]: http(env.NEXT_PUBLIC_BASE_SEPOLIA_RPC_URL, { batch: true }),
+};
+// The local devnet transport only exists when Anvil is explicitly enabled (never in production builds).
+if (ANVIL_ENABLED) transports[anvil.id] = http("http://127.0.0.1:8545", { batch: true });
+
 export const wagmiConfig = createConfig({
   chains: supportedChains(ANVIL_ENABLED),
   connectors,
   ssr: true,
-  transports: {
-    [baseSepolia.id]: http(env.NEXT_PUBLIC_BASE_SEPOLIA_RPC_URL, { batch: true }),
-    [anvil.id]: http("http://127.0.0.1:8545", { batch: true }),
-  },
+  transports,
 });
 
 declare module "wagmi" {

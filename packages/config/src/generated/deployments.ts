@@ -30,5 +30,32 @@ export const deployments: Partial<Record<number, DeploymentManifest>> = {
       "PositionRenderer": "0x2495065f15764c353eb19d0261bc5d89daf1cb3ce1c8f7686ddb427acabfdc4d",
       "LiquidStakingVault": "0xc3946d8db34161611d13991b3d14796881efa52b4237fb6f9ca7abb313b6ac54"
     }
+  },
+  "84532": {
+    "network": "base-sepolia",
+    "chainId": 84532,
+    "version": "0.1.0",
+    "deployedAt": 1790482724,
+    "startBlock": 47357225,
+    "contracts": {
+      "ForgeToken": "0x2C60E2597f13A6a907B0ee7B0651888C455a0489",
+      "FormaStaking": "0xA7A77a7Ac3a34BeFbC297dB43D676e15Ae3187df",
+      "LiquidStakingVault": "0x88703bCCb6C9757294AD936Afc7813403d791677",
+      "PositionNFT": "0x135120723F7a50CC8f305a6fAdB42450F5D55421",
+      "PositionRenderer": "0xfFF02e931872FdEE16a4349Ec27319E829A14897"
+    },
+    "roles": {
+      "admin": "0x23D4Fe2e9AF46Dd89a21FDa53551c7E55E222660",
+      "pauser": "0x23D4Fe2e9AF46Dd89a21FDa53551c7E55E222660",
+      "poolManager": "0x23D4Fe2e9AF46Dd89a21FDa53551c7E55E222660",
+      "rewardManager": "0x23D4Fe2e9AF46Dd89a21FDa53551c7E55E222660"
+    },
+    "transactions": {
+      "ForgeToken": "0xf5b89d332bc0ab078cb94c791f6c603c9583845e961d29f5fb966c28ebe103c3",
+      "PositionNFT": "0x7bb74109c79e633f491494fdf8222bfa11a3fb79728d3fdc4815695af7b0385f",
+      "FormaStaking": "0x3c5341464cf4b62247c6fbfcd1f9907e5d410e02d17f22d6513351c94cd2c58d",
+      "PositionRenderer": "0xbb03dbe116f2bae279e355c5c4dd1765ecbb952e7a9252f78b37261e1af2de20",
+      "LiquidStakingVault": "0xa08f89cb6a5e29f3792f661c470982286703e62eb623f97fc4542721e508a136"
+    }
   }
 };

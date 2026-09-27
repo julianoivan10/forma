@@ -13,8 +13,8 @@ liquid staking vault (stFORGE).
 | --- | --- |
 | Contracts | `FormaStaking`, `PositionNFT`, `PositionRenderer`, `LiquidStakingVault`, `ForgeToken` — Solidity 0.8.28, Foundry, OpenZeppelin 5.6, non-upgradeable |
 | Frontend | Next.js 16, React 19, wagmi 2 / viem 2, RainbowKit, TanStack Query, Tailwind 4 |
-| Tests | 193 Foundry (unit, fuzz, invariant, deployment) · 14 SDK · 10 component · 29 Playwright e2e on a real local chain |
-| Status | Local: complete and end-to-end tested. Base Sepolia: **not yet deployed** |
+| Tests | 193 Foundry (unit, fuzz, invariant, deployment) · 18 SDK · 19 component · 35 Playwright e2e on a real local chain |
+| Status | Contracts **deployed and verified on Base Sepolia** ([addresses](docs/TESTNET.md#deployment-record)). Real-wallet testnet run and public frontend: **pending** |
 
 ## Quick start (local)
 
